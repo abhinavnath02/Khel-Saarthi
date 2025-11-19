@@ -1,6 +1,6 @@
 # Khel Saarthi - Your Sport, Your Community
 
-Khel Saarthi is a mobile-first platform designed to solve the fragmentation in India's local sports ecosystem. It serves as a single, unified hub that connects athletes with organizers, making it easy to explore, join, and manage sporting events.
+Khel Saarthi is a mobile-first platform designed to solve the fragmentation in India's local sports ecosystem. It serves as a single, unified hub that connects athletes with organizers, making it easy to discover, join, and manage sporting events.
 
 ## Features Implemented
 
