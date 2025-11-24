@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  Alert, 
-  ActivityIndicator, 
-  ScrollView,
-  StatusBar,
-  ImageBackground,
-  TouchableOpacity
+import {
+    View,
+    Text,
+    StyleSheet,
+    Alert,
+    ActivityIndicator,
+    ScrollView,
+    StatusBar,
+    ImageBackground,
+    TouchableOpacity
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -82,7 +82,7 @@ const EventDetailsScreen = ({ route, navigation }) => {
         );
     }
 
-    const isHost = event.host._id.toString() === user?._id.toString();
+    const isHost = event.host?._id?.toString() === user?._id?.toString();
     const isRegistered = event.registeredParticipants.includes(user?._id);
     const hoursLeft = calculateHoursLeft(event.date);
     const eventDateInfo = formatEventDate(event.date);
@@ -90,7 +90,7 @@ const EventDetailsScreen = ({ route, navigation }) => {
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
-            
+
             {/* Header Image */}
             <ImageBackground
                 source={{ uri: getSportImage(event.category) }}
@@ -99,13 +99,13 @@ const EventDetailsScreen = ({ route, navigation }) => {
             >
                 <View style={styles.headerOverlay}>
                     <View style={styles.headerTop}>
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             style={styles.backButton}
                             onPress={() => navigation.goBack()}
                         >
                             <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
                         </TouchableOpacity>
-                        
+
                         <TouchableOpacity style={styles.favoriteButton}>
                             <Ionicons name="heart-outline" size={24} color="#FFFFFF" />
                         </TouchableOpacity>
@@ -122,7 +122,7 @@ const EventDetailsScreen = ({ route, navigation }) => {
                             <Ionicons name="logo-github" size={16} color="#007AFF" />
                         </View>
                     </View>
-                    
+
                     <View style={styles.eventMeta}>
                         <View style={styles.metaItem}>
                             <Ionicons name="location-outline" size={16} color="#8E8E93" />
@@ -130,7 +130,7 @@ const EventDetailsScreen = ({ route, navigation }) => {
                                 {event.location?.address || 'IIT Bhopal University Ground'}
                             </Text>
                         </View>
-                        
+
                         <View style={styles.metaItem}>
                             <Ionicons name="calendar-outline" size={16} color="#8E8E93" />
                             <Text style={styles.metaText}>
@@ -148,7 +148,7 @@ const EventDetailsScreen = ({ route, navigation }) => {
                             <Ionicons name="share-outline" size={20} color="#007AFF" />
                         </View>
                     </View>
-                    
+
                     {!isHost && !isRegistered && (
                         <StyledButton
                             title="Register"
@@ -158,7 +158,7 @@ const EventDetailsScreen = ({ route, navigation }) => {
                             style={styles.registerButton}
                         />
                     )}
-                    
+
                     {isRegistered && (
                         <View style={styles.registeredContainer}>
                             <Ionicons name="checkmark-circle" size={24} color="#34C759" />
@@ -176,7 +176,7 @@ const EventDetailsScreen = ({ route, navigation }) => {
                                 {event.registeredParticipants.length} Registered
                             </Text>
                         </View>
-                        
+
                         <View style={styles.playersPerTeam}>
                             <Ionicons name="person" size={18} color="#007AFF" />
                             <Text style={styles.participantsText}>
@@ -184,7 +184,7 @@ const EventDetailsScreen = ({ route, navigation }) => {
                             </Text>
                         </View>
                     </View>
-                    
+
                     <View style={styles.timeInfo}>
                         <Ionicons name="time" size={18} color="#FF9500" />
                         <Text style={styles.timeText}>
@@ -197,8 +197,8 @@ const EventDetailsScreen = ({ route, navigation }) => {
                 <View style={styles.descriptionSection}>
                     <Text style={styles.sectionTitle}>Description</Text>
                     <Text style={styles.descriptionText}>
-                        {event.description || 
-                         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor tellus sed rutrum venenatis. Maecenas blandit sem. Sed a lorem eget tellus pulvinar dapibus sagittis vel tellus. Mauris convallis mauris tellus.'}
+                        {event.description ||
+                            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor tellus sed rutrum venenatis. Maecenas blandit sem. Sed a lorem eget tellus pulvinar dapibus sagittis vel tellus. Mauris convallis mauris tellus.'}
                     </Text>
                     <TouchableOpacity>
                         <Text style={styles.readMoreText}>Read More</Text>
@@ -231,7 +231,7 @@ const EventDetailsScreen = ({ route, navigation }) => {
                             icon="people"
                             style={styles.actionButton}
                         />
-                        
+
                         <StyledButton
                             title="Edit Event"
                             onPress={() => navigation.navigate('EditEvent', { eventId: event._id })}
