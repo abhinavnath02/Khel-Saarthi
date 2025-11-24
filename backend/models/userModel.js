@@ -19,7 +19,7 @@ const userSchema = mongoose.Schema(
         role: {
             type: String,
             required: true,
-            enum: ['participant', 'host'],
+            enum: ['participant', 'host', 'venue_manager'],
             default: 'participant',
         },
         profilePicture: {

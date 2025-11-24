@@ -6,7 +6,9 @@ const {
     createVenue,
     getVenues,
     getVenueById,
-    createBooking
+    updateVenue,
+    createBooking,
+    getHostBookings
 } = require('../controllers/venueController');
 const { protect } = require('../middleware/authMiddleware');
 
@@ -39,7 +41,12 @@ router.route('/')
     .get(getVenues)
     .post(protect, upload.array('images', 5), createVenue);
 
-router.route('/:id').get(getVenueById);
+router.route('/bookings/host')
+    .get(protect, getHostBookings);
+
+router.route('/:id')
+    .get(getVenueById)
+    .put(protect, upload.array('images', 5), updateVenue);
 
 router.route('/:id/book').post(protect, createBooking);
 
