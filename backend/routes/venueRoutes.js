@@ -3,29 +3,28 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const {
-    getAllEvents,
-    getEventById,
-    createEvent,
-    updateEvent,
-    registerForEvent,
-    getEventParticipants,
-    getChatHistory,
-} = require('../controllers/eventController');
+    createVenue,
+    getVenues,
+    getVenueById,
+    updateVenue,
+    createBooking,
+    getHostBookings
+} = require('../controllers/venueController');
 const { protect } = require('../middleware/authMiddleware');
 
-// Configure multer for file uploads
+// Configure multer for venue images
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'uploads/');
     },
     filename: (req, file, cb) => {
-        cb(null, `banner-${Date.now()}${path.extname(file.originalname)}`);
+        cb(null, `venue-${Date.now()}-${Math.round(Math.random() * 1E9)}${path.extname(file.originalname)}`);
     },
 });
 
 const upload = multer({
     storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
     fileFilter: (req, file, cb) => {
         const allowedTypes = /jpeg|jpg|png|webp/;
         const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
@@ -38,10 +37,17 @@ const upload = multer({
     },
 });
 
-router.route('/').get(getAllEvents).post(protect, upload.single('bannerImage'), createEvent);
-router.route('/:id').get(getEventById).put(protect, upload.single('bannerImage'), updateEvent);
-router.route('/:id/register').post(protect, registerForEvent);
-router.route('/:id/participants').get(protect, getEventParticipants);
-router.route('/:id/chat').get(protect, getChatHistory);
+router.route('/')
+    .get(getVenues)
+    .post(protect, upload.array('images', 5), createVenue);
+
+router.route('/bookings/host')
+    .get(protect, getHostBookings);
+
+router.route('/:id')
+    .get(getVenueById)
+    .put(protect, upload.array('images', 5), updateVenue);
+
+router.route('/:id/book').post(protect, createBooking);
 
 module.exports = router;

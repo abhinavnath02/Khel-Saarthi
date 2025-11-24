@@ -29,6 +29,14 @@ const eventSchema = mongoose.Schema(
             required: true,
             ref: 'User',
         },
+        bannerImage: {
+            type: String,
+            default: '', // Cloudinary image URL
+        },
+        bannerImagePublicId: {
+            type: String,
+            default: '', // Cloudinary public_id for deletion/replacement
+        },
         registeredParticipants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     },
     { timestamps: true }

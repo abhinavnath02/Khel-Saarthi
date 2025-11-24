@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TextInput, 
-  Alert, 
-  Switch,
-  StatusBar,
-  TouchableOpacity,
-  KeyboardAvoidingView,
-  Platform
+import {
+    View,
+    Text,
+    StyleSheet,
+    TextInput,
+    Alert,
+    StatusBar,
+    TouchableOpacity,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,7 +21,7 @@ const RegisterScreen = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [isHost, setIsHost] = useState(false);
+    const [role, setRole] = useState('participant'); // 'participant', 'host', 'venue_manager'
     const [loading, setLoading] = useState(false);
 
     const handleRegister = async () => {
@@ -29,10 +29,9 @@ const RegisterScreen = ({ navigation }) => {
             Alert.alert('Error', 'Please fill in all fields.');
             return;
         }
-        
+
         setLoading(true);
         try {
-            const role = isHost ? 'host' : 'participant';
             await api.post('/users/register', {
                 name,
                 email,
@@ -55,113 +54,143 @@ const RegisterScreen = ({ navigation }) => {
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-            <KeyboardAvoidingView 
+            <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.keyboardView}
             >
-                <View style={styles.header}>
-                    <TouchableOpacity 
-                        style={styles.backButton}
-                        onPress={() => navigation.goBack()}
-                    >
-                        <Ionicons name="chevron-back" size={24} color="#007AFF" />
-                    </TouchableOpacity>
-                    
-                    <View style={styles.headerContent}>
-                        <View style={styles.logo}>
-                            <Ionicons name="person-add" size={48} color="#007AFF" />
-                        </View>
-                        <Text style={styles.title}>Create Account</Text>
-                        <Text style={styles.subtitle}>Join the sports community</Text>
-                    </View>
-                </View>
+                <ScrollView contentContainerStyle={styles.scrollContent}>
+                    <View style={styles.header}>
+                        <TouchableOpacity
+                            style={styles.backButton}
+                            onPress={() => navigation.goBack()}
+                        >
+                            <Ionicons name="chevron-back" size={24} color="#007AFF" />
+                        </TouchableOpacity>
 
-                <View style={styles.formContainer}>
-                    <View style={styles.inputContainer}>
-                        <View style={styles.inputWrapper}>
-                            <Ionicons name="person-outline" size={20} color="#8E8E93" style={styles.inputIcon} />
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Full Name"
-                                placeholderTextColor="#8E8E93"
-                                value={name}
-                                onChangeText={setName}
-                                autoCorrect={false}
-                            />
+                        <View style={styles.headerContent}>
+                            <View style={styles.logo}>
+                                <Ionicons name="person-add" size={48} color="#007AFF" />
+                            </View>
+                            <Text style={styles.title}>Create Account</Text>
+                            <Text style={styles.subtitle}>Join the sports community</Text>
                         </View>
-                        
-                        <View style={styles.inputWrapper}>
-                            <Ionicons name="mail-outline" size={20} color="#8E8E93" style={styles.inputIcon} />
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Email"
-                                placeholderTextColor="#8E8E93"
-                                value={email}
-                                onChangeText={setEmail}
-                                keyboardType="email-address"
-                                autoCapitalize="none"
-                                autoCorrect={false}
-                            />
-                        </View>
-                        
-                        <View style={styles.inputWrapper}>
-                            <Ionicons name="lock-closed-outline" size={20} color="#8E8E93" style={styles.inputIcon} />
-                            <TextInput
-                                style={[styles.input, styles.passwordInput]}
-                                placeholder="Password"
-                                placeholderTextColor="#8E8E93"
-                                value={password}
-                                onChangeText={setPassword}
-                                secureTextEntry={!showPassword}
-                                autoCorrect={false}
-                            />
-                            <TouchableOpacity 
-                                onPress={() => setShowPassword(!showPassword)}
-                                style={styles.passwordToggle}
-                            >
-                                <Ionicons 
-                                    name={showPassword ? "eye-off-outline" : "eye-outline"} 
-                                    size={20} 
-                                    color="#8E8E93" 
+                    </View>
+
+                    <View style={styles.formContainer}>
+                        <View style={styles.inputContainer}>
+                            <View style={styles.inputWrapper}>
+                                <Ionicons name="person-outline" size={20} color="#8E8E93" style={styles.inputIcon} />
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="Full Name"
+                                    placeholderTextColor="#8E8E93"
+                                    value={name}
+                                    onChangeText={setName}
+                                    autoCorrect={false}
                                 />
+                            </View>
+
+                            <View style={styles.inputWrapper}>
+                                <Ionicons name="mail-outline" size={20} color="#8E8E93" style={styles.inputIcon} />
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="Email"
+                                    placeholderTextColor="#8E8E93"
+                                    value={email}
+                                    onChangeText={setEmail}
+                                    keyboardType="email-address"
+                                    autoCapitalize="none"
+                                    autoCorrect={false}
+                                />
+                            </View>
+
+                            <View style={styles.inputWrapper}>
+                                <Ionicons name="lock-closed-outline" size={20} color="#8E8E93" style={styles.inputIcon} />
+                                <TextInput
+                                    style={[styles.input, styles.passwordInput]}
+                                    placeholder="Password"
+                                    placeholderTextColor="#8E8E93"
+                                    value={password}
+                                    onChangeText={setPassword}
+                                    secureTextEntry={!showPassword}
+                                    autoCorrect={false}
+                                />
+                                <TouchableOpacity
+                                    onPress={() => setShowPassword(!showPassword)}
+                                    style={styles.passwordToggle}
+                                >
+                                    <Ionicons
+                                        name={showPassword ? "eye-off-outline" : "eye-outline"}
+                                        size={20}
+                                        color="#8E8E93"
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+
+                        <View style={styles.roleSection}>
+                            <Text style={styles.sectionTitle}>I want to register as:</Text>
+
+                            <TouchableOpacity
+                                style={[styles.roleOption, role === 'participant' && styles.roleOptionSelected]}
+                                onPress={() => setRole('participant')}
+                            >
+                                <View style={styles.roleIcon}>
+                                    <Ionicons name="person" size={24} color={role === 'participant' ? "#fff" : "#007AFF"} />
+                                </View>
+                                <View style={styles.roleInfo}>
+                                    <Text style={[styles.roleTitle, role === 'participant' && styles.roleTextSelected]}>User</Text>
+                                    <Text style={[styles.roleDescription, role === 'participant' && styles.roleTextSelected]}>Join events and book venues</Text>
+                                </View>
+                                {role === 'participant' && <Ionicons name="checkmark-circle" size={24} color="#fff" />}
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                style={[styles.roleOption, role === 'host' && styles.roleOptionSelected]}
+                                onPress={() => setRole('host')}
+                            >
+                                <View style={styles.roleIcon}>
+                                    <Ionicons name="trophy" size={24} color={role === 'host' ? "#fff" : "#007AFF"} />
+                                </View>
+                                <View style={styles.roleInfo}>
+                                    <Text style={[styles.roleTitle, role === 'host' && styles.roleTextSelected]}>Event Host</Text>
+                                    <Text style={[styles.roleDescription, role === 'host' && styles.roleTextSelected]}>Organize tournaments and matches</Text>
+                                </View>
+                                {role === 'host' && <Ionicons name="checkmark-circle" size={24} color="#fff" />}
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                style={[styles.roleOption, role === 'venue_manager' && styles.roleOptionSelected]}
+                                onPress={() => setRole('venue_manager')}
+                            >
+                                <View style={styles.roleIcon}>
+                                    <Ionicons name="business" size={24} color={role === 'venue_manager' ? "#fff" : "#007AFF"} />
+                                </View>
+                                <View style={styles.roleInfo}>
+                                    <Text style={[styles.roleTitle, role === 'venue_manager' && styles.roleTextSelected]}>Venue Host</Text>
+                                    <Text style={[styles.roleDescription, role === 'venue_manager' && styles.roleTextSelected]}>List and manage sports venues</Text>
+                                </View>
+                                {role === 'venue_manager' && <Ionicons name="checkmark-circle" size={24} color="#fff" />}
                             </TouchableOpacity>
                         </View>
+
+                        <StyledButton
+                            title="Create Account"
+                            onPress={handleRegister}
+                            disabled={loading}
+                            size="large"
+                            style={styles.registerButton}
+                        />
                     </View>
 
-                    <View style={styles.switchSection}>
-                        <View style={styles.switchContainer}>
-                            <View style={styles.switchInfo}>
-                                <Text style={styles.switchLabel}>Register as Event Host</Text>
-                                <Text style={styles.switchDescription}>
-                                    Hosts can create and manage sports events
-                                </Text>
-                            </View>
-                            <Switch
-                                trackColor={{ false: "#E5E5EA", true: "#007AFF" }}
-                                thumbColor={isHost ? "#FFFFFF" : "#FFFFFF"}
-                                onValueChange={() => setIsHost(previousState => !previousState)}
-                                value={isHost}
-                                style={styles.switch}
-                            />
-                        </View>
+                    <View style={styles.footer}>
+                        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                            <Text style={styles.loginText}>
+                                Already have an account? <Text style={styles.loginLink}>Sign In</Text>
+                            </Text>
+                        </TouchableOpacity>
                     </View>
-
-                    <StyledButton 
-                        title="Create Account" 
-                        onPress={handleRegister}
-                        disabled={loading}
-                        size="large"
-                        style={styles.registerButton}
-                    />
-                </View>
-
-                <View style={styles.footer}>
-                    <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                        <Text style={styles.loginText}>
-                            Already have an account? <Text style={styles.loginLink}>Sign In</Text>
-                        </Text>
-                    </TouchableOpacity>
-                </View>
+                </ScrollView>
             </KeyboardAvoidingView>
         </SafeAreaView>
     );
@@ -175,10 +204,13 @@ const styles = StyleSheet.create({
     keyboardView: {
         flex: 1,
     },
+    scrollContent: {
+        flexGrow: 1,
+    },
     header: {
         paddingTop: 20,
         paddingHorizontal: 32,
-        paddingBottom: 40,
+        paddingBottom: 20,
     },
     backButton: {
         width: 40,
@@ -187,7 +219,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#F2F2F7',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 32,
+        marginBottom: 20,
     },
     headerContent: {
         alignItems: 'center',
@@ -245,33 +277,47 @@ const styles = StyleSheet.create({
         right: 16,
         padding: 4,
     },
-    switchSection: {
-        marginBottom: 32,
+    roleSection: {
+        marginBottom: 24,
     },
-    switchContainer: {
+    sectionTitle: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#1D1D1F',
+        marginBottom: 12,
+    },
+    roleOption: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#F8F9FA',
+        backgroundColor: '#F2F2F7',
         borderRadius: 12,
         padding: 16,
+        marginBottom: 12,
+        borderWidth: 1,
+        borderColor: 'transparent',
     },
-    switchInfo: {
-        flex: 1,
+    roleOptionSelected: {
+        backgroundColor: '#007AFF',
+        borderColor: '#007AFF',
+    },
+    roleIcon: {
         marginRight: 16,
     },
-    switchLabel: {
+    roleInfo: {
+        flex: 1,
+    },
+    roleTitle: {
         fontSize: 16,
         fontWeight: '600',
         color: '#1D1D1F',
         marginBottom: 4,
     },
-    switchDescription: {
-        fontSize: 14,
+    roleDescription: {
+        fontSize: 13,
         color: '#8E8E93',
-        lineHeight: 18,
     },
-    switch: {
-        transform: [{ scaleX: 1.1 }, { scaleY: 1.1 }],
+    roleTextSelected: {
+        color: '#FFFFFF',
     },
     registerButton: {
         marginBottom: 24,

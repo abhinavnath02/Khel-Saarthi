@@ -1,6 +1,8 @@
 const asyncHandler = require('express-async-handler');
 const Event = require('../models/eventModel');
 const Message = require('../models/messageModel');
+const { uploadToCloudinary, deleteFromCloudinary } = require('../utils/cloudinaryUpload');
+const fs = require('fs');
 
 const getAllEvents = asyncHandler(async (req, res) => {
     const { category, skillLevel, maxFee, search, startDate, endDate } = req.query;
@@ -29,18 +31,53 @@ const getEventById = asyncHandler(async (req, res) => {
 });
 
 const createEvent = asyncHandler(async (req, res) => {
-    const { title, description, date, location, category, skillLevel, entryFee } = req.body;
+    let { title, description, date, location, category, skillLevel, entryFee } = req.body;
+
     if (req.user.role !== 'host') {
         res.status(403);
         throw new Error('User is not a host');
     }
-    const event = new Event({ title, description, date, location, category, skillLevel, entryFee, host: req.user._id });
+
+    // Parse location if it's a string (from FormData)
+    if (typeof location === 'string') {
+        location = JSON.parse(location);
+    }
+
+    let bannerImage = '';
+    let bannerImagePublicId = '';
+
+    // Handle banner image upload if provided
+    if (req.file && req.file.path) {
+        try {
+            const { url, publicId } = await uploadToCloudinary(req.file.path, 'event_banners');
+            bannerImage = url;
+            bannerImagePublicId = publicId;
+            // Remove local file after upload
+            fs.unlinkSync(req.file.path);
+        } catch (err) {
+            res.status(500);
+            throw new Error('Banner image upload failed: ' + err.message);
+        }
+    }
+
+    const event = new Event({
+        title,
+        description,
+        date,
+        location,
+        category,
+        skillLevel,
+        entryFee,
+        host: req.user._id,
+        bannerImage,
+        bannerImagePublicId
+    });
     const createdEvent = await event.save();
     res.status(201).json(createdEvent);
 });
 
 const updateEvent = asyncHandler(async (req, res) => {
-    const { title, description, date, location, category, skillLevel, entryFee } = req.body;
+    let { title, description, date, location, category, skillLevel, entryFee } = req.body;
     const event = await Event.findById(req.params.id);
     if (!event) {
         res.status(404);
@@ -50,10 +87,32 @@ const updateEvent = asyncHandler(async (req, res) => {
         res.status(403);
         throw new Error('User not authorized to update this event');
     }
+
+    // Handle banner image upload if provided
+    if (req.file && req.file.path) {
+        try {
+            // Delete old banner if exists
+            if (event.bannerImagePublicId) {
+                await deleteFromCloudinary(event.bannerImagePublicId);
+            }
+            const { url, publicId } = await uploadToCloudinary(req.file.path, 'event_banners');
+            event.bannerImage = url;
+            event.bannerImagePublicId = publicId;
+            // Remove local file after upload
+            fs.unlinkSync(req.file.path);
+        } catch (err) {
+            res.status(500);
+            throw new Error('Banner image upload failed: ' + err.message);
+        }
+    }
+
     event.title = title || event.title;
     event.description = description || event.description;
     event.date = date || event.date;
-    event.location = location || event.location;
+    // Parse location if it's a string (from FormData)
+    if (location) {
+        event.location = typeof location === 'string' ? JSON.parse(location) : location;
+    }
     event.category = category || event.category;
     event.skillLevel = skillLevel || event.skillLevel;
     event.entryFee = entryFee !== undefined ? entryFee : event.entryFee;
