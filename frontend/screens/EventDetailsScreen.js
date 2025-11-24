@@ -93,7 +93,7 @@ const EventDetailsScreen = ({ route, navigation }) => {
 
             {/* Header Image */}
             <ImageBackground
-                source={{ uri: getSportImage(event.category) }}
+                source={{ uri: event.bannerImage || getSportImage(event.category) }}
                 style={styles.headerImage}
                 imageStyle={styles.headerImageStyle}
             >

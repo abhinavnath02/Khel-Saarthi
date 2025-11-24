@@ -9,7 +9,7 @@ const EventCard = ({ event, onPress, style = {} }) => {
   return (
     <TouchableOpacity onPress={onPress} style={[styles.container, style]}>
       <ImageBackground
-        source={{ uri: getSportImage(event.category, 'w=400') }}
+        source={{ uri: event.bannerImage || getSportImage(event.category, 'w=400') }}
         style={styles.imageBackground}
         imageStyle={styles.backgroundImage}
       >
@@ -23,17 +23,17 @@ const EventCard = ({ event, onPress, style = {} }) => {
               <Text style={styles.categoryText}>{event.category}</Text>
             </View>
           </View>
-          
+
           <View style={styles.content}>
             <Text style={styles.title} numberOfLines={2}>{event.title}</Text>
-            
+
             <View style={styles.locationContainer}>
               <Ionicons name="location-outline" size={14} color="#FFFFFF" />
               <Text style={styles.location}>
                 {event.location?.address || 'Location TBD'}
               </Text>
             </View>
-            
+
             <View style={styles.footer}>
               <View style={styles.participantsContainer}>
                 <Ionicons name="people-outline" size={14} color="#FFFFFF" />
@@ -41,7 +41,7 @@ const EventCard = ({ event, onPress, style = {} }) => {
                   {event.registeredParticipants?.length || 0} registered
                 </Text>
               </View>
-              
+
               <View style={styles.hostContainer}>
                 <Text style={styles.hostLabel}>By</Text>
                 <Text style={styles.hostName}>{event.host?.name}</Text>

@@ -9,10 +9,14 @@ const getSportsNews = async (req, res) => {
             return res.status(500).json({ message: 'News API key is missing in backend .env' });
         }
 
-        const response = await axios.get(`https://newsapi.org/v2/top-headlines`, {
+        // Switch to 'everything' endpoint to search for specific Indian sports
+        // This avoids the empty results from the 'in' category and gives more relevant content
+        const response = await axios.get(`https://newsapi.org/v2/everything`, {
             params: {
-                category: 'sports',
-                country: 'us', // Default to India, can be changed
+                q: 'cricket OR badminton OR "indian football" OR "team india" OR kabaddi',
+                language: 'en',
+                sortBy: 'publishedAt',
+                pageSize: 20, // Limit to 20 relevant articles
                 apiKey: apiKey
             }
         });
@@ -20,7 +24,11 @@ const getSportsNews = async (req, res) => {
         res.json(response.data);
     } catch (error) {
         console.error('Error fetching news:', error.message);
-        res.status(500).json({ message: 'Failed to fetch news' });
+        if (error.response) {
+            console.error('News API Error Response:', error.response.data);
+            console.error('News API Status:', error.response.status);
+        }
+        res.status(500).json({ message: 'Failed to fetch news', error: error.message });
     }
 };
 
