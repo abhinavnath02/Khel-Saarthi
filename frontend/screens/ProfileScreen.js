@@ -208,7 +208,7 @@ const ProfileScreen = ({ navigation }) => {
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="dark-content" backgroundColor="#F8F9FA" />
-            <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+            <ScrollView style={styles.scrollView} contentContainerStyle={{ paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
                 <ProfileCard
                     user={user}
                     onEditPress={() => setEditMode(true)}
@@ -226,10 +226,25 @@ const ProfileScreen = ({ navigation }) => {
                             color="#FF6B35"
                         />
                         <StatCard
-                            icon="star"
                             title="Rating"
-                            value={badmintonProfile.skillLevel || "N/A"}
-                            color="#FFD700"
+                            image={
+                                badmintonProfile.skillLevel === 'Beginner'
+                                    ? require('../assets/beginner.png')
+                                    : badmintonProfile.skillLevel === 'Intermediate'
+                                    ? require('../assets/intermediate.png')
+                                    : badmintonProfile.skillLevel === 'Advanced'
+                                    ? require('../assets/advance.png')
+                                    : null
+                            }
+                            imageColor={
+                                badmintonProfile.skillLevel === 'Beginner'
+                                    ? '#E8F5E9'
+                                    : badmintonProfile.skillLevel === 'Intermediate'
+                                    ? '#E3F2FD'
+                                    : badmintonProfile.skillLevel === 'Advanced'
+                                    ? '#FFF3E0'
+                                    : '#FFFFFF'
+                            }
                         />
                     </StatRow>
                     <StatRow>

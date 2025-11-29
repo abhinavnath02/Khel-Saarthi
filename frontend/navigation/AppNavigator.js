@@ -9,6 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import api from '../api/api';
 import AuthContext from '../context/AuthContext';
+import FloatingTabBar from '../components/FloatingTabBar';
 
 // Import all Screens
 import HomeScreen from '../screens/HomeScreen';
@@ -33,7 +34,23 @@ const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const VenueStack = createStackNavigator();
 
-function HomeStack() {
+function HomeStack({ navigation }) {
+    React.useEffect(() => {
+        const unsubscribe = navigation.addListener('state', (e) => {
+            const routes = e.data.state.routes;
+            const currentRoute = routes[routes.length - 1];
+            
+            // Hide tab bar for sub-screens
+            if (currentRoute.name !== 'Home') {
+                navigation.setOptions({ tabBarStyle: { display: 'none' } });
+            } else {
+                navigation.setOptions({ tabBarStyle: undefined });
+            }
+        });
+        
+        return unsubscribe;
+    }, [navigation]);
+
     return (
         <Stack.Navigator
             screenOptions={{
@@ -56,7 +73,23 @@ function HomeStack() {
     );
 }
 
-function ProfileStack() {
+function ProfileStack({ navigation }) {
+    React.useEffect(() => {
+        const unsubscribe = navigation.addListener('state', (e) => {
+            const routes = e.data.state.routes;
+            const currentRoute = routes[routes.length - 1];
+            
+            // Hide tab bar for sub-screens
+            if (currentRoute.name !== 'Profile') {
+                navigation.setOptions({ tabBarStyle: { display: 'none' } });
+            } else {
+                navigation.setOptions({ tabBarStyle: undefined });
+            }
+        });
+        
+        return unsubscribe;
+    }, [navigation]);
+
     return (
         <Stack.Navigator
             screenOptions={{
@@ -89,7 +122,23 @@ function NewsStack() {
     );
 }
 
-function VenueStackScreen() {
+function VenueStackScreen({ navigation }) {
+    React.useEffect(() => {
+        const unsubscribe = navigation.addListener('state', (e) => {
+            const routes = e.data.state.routes;
+            const currentRoute = routes[routes.length - 1];
+            
+            // Hide tab bar for sub-screens
+            if (currentRoute.name !== 'VenueList') {
+                navigation.setOptions({ tabBarStyle: { display: 'none' } });
+            } else {
+                navigation.setOptions({ tabBarStyle: undefined });
+            }
+        });
+        
+        return unsubscribe;
+    }, [navigation]);
+
     return (
         <VenueStack.Navigator
             screenOptions={{
@@ -155,22 +204,10 @@ const AppNavigator = () => {
         <NavigationContainer>
             {user ? (
                 <Tab.Navigator
-                    screenOptions={({ route }) => ({
-                        tabBarIcon: ({ focused, color, size }) => {
-                            let iconName;
-                            if (route.name === 'HomeStack') iconName = focused ? 'home' : 'home-outline';
-                            else if (route.name === 'VenueStack') iconName = focused ? 'calendar' : 'calendar-outline';
-                            else if (route.name === 'NewsStack') iconName = focused ? 'newspaper' : 'newspaper-outline';
-                            else if (route.name === 'ProfileStack') iconName = focused ? 'person' : 'person-outline';
-                            return <Ionicons name={iconName} size={size} color={color} />;
-                        },
+                    tabBar={(props) => <FloatingTabBar {...props} />}
+                    screenOptions={{
                         headerShown: false,
-                        tabBarActiveTintColor: '#007AFF',
-                        tabBarInactiveTintColor: '#8E8E93',
-                        tabBarStyle: { backgroundColor: '#FFFFFF', borderTopWidth: 1, borderTopColor: '#E5E5EA', height: 90, paddingBottom: 20, paddingTop: 8 },
-                        tabBarLabelStyle: { fontSize: 12, fontWeight: '600', marginTop: 4 },
-                        tabBarIconStyle: { marginTop: 4 },
-                    })}
+                    }}
                 >
                     <Tab.Screen name="HomeStack" component={HomeStack} options={{ title: 'Home' }} />
                     <Tab.Screen name="VenueStack" component={VenueStackScreen} options={{ title: 'Venues' }} />
