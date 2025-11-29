@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { io } from 'socket.io-client';
@@ -34,23 +34,7 @@ const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const VenueStack = createStackNavigator();
 
-function HomeStack({ navigation }) {
-    React.useEffect(() => {
-        const unsubscribe = navigation.addListener('state', (e) => {
-            const routes = e.data.state.routes;
-            const currentRoute = routes[routes.length - 1];
-            
-            // Hide tab bar for sub-screens
-            if (currentRoute.name !== 'Home') {
-                navigation.setOptions({ tabBarStyle: { display: 'none' } });
-            } else {
-                navigation.setOptions({ tabBarStyle: undefined });
-            }
-        });
-        
-        return unsubscribe;
-    }, [navigation]);
-
+function HomeStack() {
     return (
         <Stack.Navigator
             screenOptions={{
@@ -73,23 +57,7 @@ function HomeStack({ navigation }) {
     );
 }
 
-function ProfileStack({ navigation }) {
-    React.useEffect(() => {
-        const unsubscribe = navigation.addListener('state', (e) => {
-            const routes = e.data.state.routes;
-            const currentRoute = routes[routes.length - 1];
-            
-            // Hide tab bar for sub-screens
-            if (currentRoute.name !== 'Profile') {
-                navigation.setOptions({ tabBarStyle: { display: 'none' } });
-            } else {
-                navigation.setOptions({ tabBarStyle: undefined });
-            }
-        });
-        
-        return unsubscribe;
-    }, [navigation]);
-
+function ProfileStack() {
     return (
         <Stack.Navigator
             screenOptions={{
@@ -122,23 +90,7 @@ function NewsStack() {
     );
 }
 
-function VenueStackScreen({ navigation }) {
-    React.useEffect(() => {
-        const unsubscribe = navigation.addListener('state', (e) => {
-            const routes = e.data.state.routes;
-            const currentRoute = routes[routes.length - 1];
-            
-            // Hide tab bar for sub-screens
-            if (currentRoute.name !== 'VenueList') {
-                navigation.setOptions({ tabBarStyle: { display: 'none' } });
-            } else {
-                navigation.setOptions({ tabBarStyle: undefined });
-            }
-        });
-        
-        return unsubscribe;
-    }, [navigation]);
-
+function VenueStackScreen() {
     return (
         <VenueStack.Navigator
             screenOptions={{
@@ -200,6 +152,12 @@ const AppNavigator = () => {
         );
     }
 
+    const getTabBarVisibility = (route) => {
+        const routeName = getFocusedRouteNameFromRoute(route);
+        const hiddenScreens = ['CreateEvent', 'EditEvent', 'EventDetails', 'Participants', 'Chat', 'BadmintonProfile', 'AiChat', 'VenueDetails', 'AddVenue', 'EditVenue', 'MyBookings'];
+        return hiddenScreens.includes(routeName) ? 'none' : 'flex';
+    };
+
     return (
         <NavigationContainer>
             {user ? (
@@ -209,10 +167,31 @@ const AppNavigator = () => {
                         headerShown: false,
                     }}
                 >
-                    <Tab.Screen name="HomeStack" component={HomeStack} options={{ title: 'Home' }} />
-                    <Tab.Screen name="VenueStack" component={VenueStackScreen} options={{ title: 'Venues' }} />
+                    <Tab.Screen 
+                        name="HomeStack" 
+                        component={HomeStack} 
+                        options={({ route }) => ({ 
+                            title: 'Home',
+                            tabBarStyle: { display: getTabBarVisibility(route) }
+                        })} 
+                    />
+                    <Tab.Screen 
+                        name="VenueStack" 
+                        component={VenueStackScreen} 
+                        options={({ route }) => ({ 
+                            title: 'Venues',
+                            tabBarStyle: { display: getTabBarVisibility(route) }
+                        })} 
+                    />
                     <Tab.Screen name="NewsStack" component={NewsStack} options={{ title: 'News' }} />
-                    <Tab.Screen name="ProfileStack" component={ProfileStack} options={{ title: 'Profile' }} />
+                    <Tab.Screen 
+                        name="ProfileStack" 
+                        component={ProfileStack} 
+                        options={({ route }) => ({ 
+                            title: 'Profile',
+                            tabBarStyle: { display: getTabBarVisibility(route) }
+                        })} 
+                    />
                 </Tab.Navigator>
             ) : (
                 <Stack.Navigator screenOptions={{ headerShown: false, cardStyle: { backgroundColor: '#FFFFFF' } }}>

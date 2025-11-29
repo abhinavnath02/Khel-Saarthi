@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, StyleSheet, Platform, Animated } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLinkBuilder, useTheme } from '@react-navigation/native';
@@ -9,6 +9,41 @@ import { Ionicons } from '@expo/vector-icons';
 function FloatingTabBar({ state, descriptors, navigation }) {
   const { colors } = useTheme();
   const { buildHref } = useLinkBuilder();
+  const scaleAnims = useRef(state.routes.map(() => new Animated.Value(1))).current;
+
+  // Animate focused tab
+  useEffect(() => {
+    state.routes.forEach((route, index) => {
+      if (state.index === index) {
+        Animated.sequence([
+          Animated.spring(scaleAnims[index], {
+            toValue: 1.15,
+            friction: 3,
+            tension: 40,
+            useNativeDriver: true,
+          }),
+          Animated.spring(scaleAnims[index], {
+            toValue: 1,
+            friction: 3,
+            tension: 40,
+            useNativeDriver: true,
+          })
+        ]).start();
+      } else {
+        Animated.timing(scaleAnims[index], {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }).start();
+      }
+    });
+  }, [state.index]);
+
+  // Check if tab bar should be hidden
+  const { tabBarStyle } = descriptors[state.routes[state.index].key].options;
+  if (tabBarStyle?.display === 'none') {
+    return null;
+  }
 
   return (
     <View style={styles.tabBarContainer}>
@@ -64,9 +99,10 @@ function FloatingTabBar({ state, descriptors, navigation }) {
               onLongPress={onLongPress}
               style={styles.tabButton}
             >
-              <View style={[
+              <Animated.View style={[
                 styles.tabItemContainer,
-                isFocused && styles.tabItemFocused
+                isFocused && styles.tabItemFocused,
+                { transform: [{ scale: scaleAnims[index] }] }
               ]}>
                 <Ionicons
                   name={iconName}
@@ -83,7 +119,7 @@ function FloatingTabBar({ state, descriptors, navigation }) {
                     {label}
                   </Text>
                 )}
-              </View>
+              </Animated.View>
             </PlatformPressable>
           );
         })}
@@ -141,9 +177,10 @@ function FloatingTabBar({ state, descriptors, navigation }) {
                   onLongPress={onLongPress}
                   style={styles.tabButton}
                 >
-                  <View style={[
+                  <Animated.View style={[
                     styles.tabItemContainer,
-                    isFocused && styles.tabItemFocused
+                    isFocused && styles.tabItemFocused,
+                    { transform: [{ scale: scaleAnims[index] }] }
                   ]}>
                     <Ionicons
                       name={iconName}
@@ -160,7 +197,7 @@ function FloatingTabBar({ state, descriptors, navigation }) {
                         {label}
                       </Text>
                     )}
-                  </View>
+                  </Animated.View>
                 </PlatformPressable>
               );
             })}

@@ -19,6 +19,7 @@ import StyledButton from '../components/StyledButton';
 import ProfileCard from '../components/ProfileCard';
 import { StatCard, StatRow } from '../components/StatCard';
 import * as ImagePicker from 'expo-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../api/api';
 
 const ProfileScreen = ({ navigation }) => {
@@ -102,10 +103,16 @@ const ProfileScreen = ({ navigation }) => {
                 });
             }
 
-            const { data } = await api.put('/users/profile', formData, {
+            const { data } = await api.put('/users/update', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
 
+            // Update token and fetch fresh user data
+            if (data.token) {
+                await AsyncStorage.setItem('userToken', data.token);
+                api.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+            }
+            
             setUser(data);
             setImage(null);
             setEditMode(false);
@@ -247,7 +254,7 @@ const ProfileScreen = ({ navigation }) => {
                             }
                         />
                     </StatRow>
-                    <StatRow>
+                    {/* <StatRow>
                         <StatCard
                             icon="people"
                             title="Partners"
@@ -260,7 +267,7 @@ const ProfileScreen = ({ navigation }) => {
                             value="45"
                             color="#007AFF"
                         />
-                    </StatRow>
+                    </StatRow> */}
                 </View>
 
                 {/* Sports Profiles Section */}
