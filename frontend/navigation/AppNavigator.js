@@ -37,6 +37,8 @@ import ManageTeamsScreen from '../screens/ManageTeamsScreen';
 import GenerateFixturesScreen from '../screens/GenerateFixturesScreen';
 import MatchDetailsScreen from '../screens/MatchDetailsScreen';
 
+import AiGymTrainerScreen from '../screens/AiGymTrainerScreen';
+
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const VenueStack = createStackNavigator();
@@ -61,6 +63,7 @@ function HomeStack() {
             <Stack.Screen name="Chat" component={ChatScreen} options={({ route }) => ({ title: route.params?.eventTitle || 'Chat', headerBackTitle: 'Back' })} />
             <Stack.Screen name="BadmintonProfile" component={BadmintonProfileScreen} options={{ title: 'Badminton Profile' }} />
             <Stack.Screen name="AiChat" component={AiChatScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="AiGymTrainer" component={AiGymTrainerScreen} options={{ headerShown: false }} />
         </Stack.Navigator>
     );
 }
@@ -184,20 +187,28 @@ const AppNavigator = () => {
     const getTabBarVisibility = (route) => {
       const routeName = getFocusedRouteNameFromRoute(route);
 
+      // Screens where bottom tab bar should be hidden
+      // (deep flows like forms, chats, AI, tournaments, etc.)
       const hiddenScreens = [
+        // Event flow
         'CreateEvent',
         'EditEvent',
         'EventDetails',
         'Participants',
         'Chat',
+
+        // Profiles & AI
         'BadmintonProfile',
         'AiChat',
+        'AiGymTrainer',
+
+        // Venue flow
         'VenueDetails',
         'AddVenue',
         'EditVenue',
         'MyBookings',
 
-        // Added Tournament screens to tab bar
+        // Tournament flow
         'CreateTournament',
         'TournamentDashboard',
         'ManageTeams',
@@ -206,16 +217,22 @@ const AppNavigator = () => {
       ];
 
       return hiddenScreens.includes(routeName) ? 'none' : 'flex';
-    };
+  };
+
 
 
     return (
         <NavigationContainer>
             {user ? (
                 <Tab.Navigator
+  // Custom floating tab bar (design system)
   tabBar={(props) => <FloatingTabBar {...props} />}
+
+  // Shared screen options for all tabs
   screenOptions={({ route }) => ({
     headerShown: false,
+
+    // Tab icons for bottom navigation
     tabBarIcon: ({ focused, color, size }) => {
       let iconName;
 
@@ -229,6 +246,7 @@ const AppNavigator = () => {
     },
   })}
 >
+  {/* Home / Events */}
   <Tab.Screen
     name="HomeStack"
     component={HomeStack}
@@ -238,12 +256,14 @@ const AppNavigator = () => {
     })}
   />
 
+  {/* Tournaments */}
   <Tab.Screen
     name="TournamentStack"
     component={TournamentStackScreen}
     options={{ title: 'Tournaments' }}
   />
 
+  {/* Venues */}
   <Tab.Screen
     name="VenueStack"
     component={VenueStackScreen}
@@ -253,12 +273,14 @@ const AppNavigator = () => {
     })}
   />
 
+  {/* News */}
   <Tab.Screen
     name="NewsStack"
     component={NewsStack}
     options={{ title: 'News' }}
   />
 
+  {/* Profile */}
   <Tab.Screen
     name="ProfileStack"
     component={ProfileStack}
