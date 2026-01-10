@@ -171,8 +171,8 @@ const createBooking = asyncHandler(async (req, res) => {
 // @access  Private
 const getMyBookings = asyncHandler(async (req, res) => {
     const bookings = await Booking.find({ user: req.user._id })
-        .populate('venue')
-        .sort({ date: -1 });
+        .populate('venue', 'name description address city sportTypes pricePerHour images rating')
+        .sort({ date: -1, startTime: -1 }); // Sort by date descending (most recent first)
     res.json(bookings);
 });
 
