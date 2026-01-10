@@ -131,10 +131,12 @@ const loginUser = asyncHandler(async (req, res) => {
 // @access  Private
 const getMyEvents = asyncHandler(async (req, res) => {
     // Find all events where the registeredParticipants array contains the user's ID
-    const events = await Event.find({ registeredParticipants: req.user._id });
-    // Return just the IDs of those events
-    const eventIds = events.map(event => event._id);
-    res.json(eventIds);
+    const events = await Event.find({ registeredParticipants: req.user._id })
+        .populate('host', 'name email profilePicture')
+        .sort({ date: 1 }); // Sort by date ascending (upcoming first)
+
+    // Return full event objects with all details
+    res.json(events);
 });
 
 // @desc    Update a user's sport profile
